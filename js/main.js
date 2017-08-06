@@ -26,10 +26,34 @@ function TBoard() {
     this.activeTetro.matrix = tetroMatrix;
   }
 
+  this.moveTetroLeft = function() {
+    if (this.activeTetro != null) {
+      this.activeTetro.offset.x--;
+    }
+  }
+
+  this.moveTetroUp = function() {
+    if (this.activeTetro != null) {
+      this.activeTetro.offset.y--;
+    }
+  }
+
+  this.moveTetroRight = function() {
+    if (this.activeTetro != null) {
+      this.activeTetro.offset.x++;
+    }
+  }
+
+  this.moveTetroDown = function() {
+    if (this.activeTetro != null) {
+      this.activeTetro.offset.y++;
+    }
+  }
+
   this.textPrintGState = function() {
     var text = "";
-    for (var i = 0; i < this.board.length; i++) {
-      for (var j = 0; j < this.board[0].length; j++) { // iterate columns
+    for (var i = 0; i < this.board.length; i++) { // i is row
+      for (var j = 0; j < this.board[0].length; j++) { // j is column
         var yLength = this.activeTetro.matrix.length;
         var yInit = this.activeTetro.offset.y;
         var yEnd = (yInit + yLength) - 1;
@@ -37,7 +61,12 @@ function TBoard() {
         var xInit = this.activeTetro.offset.x;
         var xEnd = (xInit + xLength) - 1;
         if ((i >= yInit && i <= yEnd) && (j >= xInit && j <= xEnd)) {
-          text += "9" + "  ";
+          // text += "9" + "  ";
+          if (this.activeTetro.matrix[i-this.activeTetro.offset.y][j-this.activeTetro.offset.x] != 0) {
+            text += "X" + "  ";
+          } else {
+            text += "O" + "  ";
+          }
         } else {
           text += this.board[i][j] + "  ";
         }
@@ -57,7 +86,7 @@ var tTetro = [
 
 
 
-// util functions
+//-- Util functions
 function textPrint2DMatrix(matrix) {
   var text = "";
   for (var i = 0; i < matrix.length; i++) { // iterate rows
@@ -69,13 +98,27 @@ function textPrint2DMatrix(matrix) {
   return text;
 }
 
+
+
+//-- Events
 document.addEventListener("keydown", doKeyDown);
 
 function doKeyDown(event) {
-  if (event.keyCode == 40) { //ArrowDown
-    if (tBoard.activeTetro != null) {
-      tBoard.activeTetro.offset.y++;
-    }
+  switch (event.keyCode) {
+    case 37: // ArrowLeft
+      tBoard.moveTetroLeft();
+      break;
+    case 38: //ArowUp
+      tBoard.moveTetroUp();
+      break;
+    case 39: //ArowRight
+      tBoard.moveTetroRight();
+      break;
+    case 40: // ArrowDown
+      tBoard.moveTetroDown();
+      break;
+    default:
+      console.log(event.keyCode);
   }
 
 }
