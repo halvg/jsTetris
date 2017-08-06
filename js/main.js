@@ -1,8 +1,5 @@
 
 
-var tBoard = new TBoard();
-
-
 function TBoard() {
   this.boardNumColumns = 10;
   this.boardNumRows = 16;
@@ -121,4 +118,35 @@ function doKeyDown(event) {
       console.log(event.keyCode);
   }
 
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+var tBoard = new TBoard();
+
+var canvas = document.getElementById("canvas");
+var canvW = canvas.width;
+var canvH = canvas.height;
+var ctx = canvas.getContext("2d");
+
+function printToCanvas() {
+  var cWidth = canvW / tBoard.boardNumColumns;
+  var cHeight = canvH / tBoard.boardNumRows;
+
+  // firstly we paint the board
+  for (var i = 0; i < tBoard.boardNumRows; i++ ) { // i for rows
+    for (var j = 0; j < tBoard.boardNumColumns; j++) { // j for columns
+      var x = j * cWidth;
+      var y = i * cHeight;
+      if (tBoard.board[i][j] == 0) {
+        ctx.fillStyle = '#000000';
+      } else {
+        ctx.fillStyle = '#b8ad27';
+      }
+      ctx.fillRect(x, y, cWidth, cHeight);
+    }
+  }
+
+  // then we paint the tetromino
+  
 }
