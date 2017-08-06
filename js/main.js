@@ -95,17 +95,22 @@ function TetrisBoard(boardConf) {
     for (var i = 0; i < this.activeTetromino.matrix.length; i++) {
       var x = i + this.activeTetrominoInitPoint.x;
       for (var j = 0; j < this.activeTetromino.matrix.length; j++) {
-        var z = j + this.activeTetrominoInitPoint.y;
+        var y = j + this.activeTetrominoInitPoint.y;
         if (this.activeTetromino.matrix[i][j] == 1) {
-          // clear previous
-          this.cells[x][z].filled = false;
-          this.cells[x][z].colour = 'rgb(214, 219, 175)';
-          this.toBeRenderedCells.push(this.cells[x][z]);
-          // and print next
-           this.cells[x][z+1].filled = true;
-           this.cells[x][z+1].colour = this.activeTetromino.colour;
-           this.toBeRenderedCells.push(this.cells[x][z+1]);
-           console.log(this.cells[x][z+1]);
+          this.cells[x][y].filled = false;
+          this.cells[x][y].colour = "#000000";
+          this.toBeRenderedCells.push(this.cells[x][y]);
+        }
+      }
+    }
+    for (var i = 0; i < this.activeTetromino.matrix.length; i++) {
+      var x = i + this.activeTetrominoInitPoint.x;
+      for (var j = 0; j < this.activeTetromino.matrix.length; j++) {
+        var y = j + this.activeTetrominoInitPoint.y + 1;
+        if (this.activeTetromino.matrix[i][j] == 1) {
+          this.cells[x][y].filled = true;
+          this.cells[x][y].colour = this.activeTetromino.colour;
+          this.toBeRenderedCells.push(this.cells[x][y]);
         }
       }
     }
@@ -124,7 +129,7 @@ function BoardCell(pos, width, height) {
   this.pos = pos;
   this.width = width;
   this.height = height;
-  this.filled = false; // points out if cells is occupied for any piece
+  this.filled = false; // points out if cell is occupied by any piece
   this.colour;
 
   this.render = function() {
