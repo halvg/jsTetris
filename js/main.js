@@ -128,11 +128,39 @@ var canvas = document.getElementById("canvas");
 var canvW = canvas.width;
 var canvH = canvas.height;
 var ctx = canvas.getContext("2d");
+initGame();
+
+
+function initGame() {
+  tBoard.pushTetro(tTetro);
+  gameLoop();
+}
+
+var fps = 60/1000;
+var last = new Date().getTime();
+function gameLoop() {
+  var now = new Date().getTime();
+  var delta = (now - last)/1000;
+  if (delta >= fps) {
+    console.log(delta);
+    updateGame();
+    renderGame();
+    last = new Date().getTime();
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+function updateGame(){
+}
+
+function renderGame() {
+  printToCanvas();
+  // console.log(tBoard.textPrintGState());
+}
 
 function printToCanvas() {
   var cWidth = canvW / tBoard.boardNumColumns;
   var cHeight = canvH / tBoard.boardNumRows;
-
   // firstly we paint the board
   for (var i = 0; i < tBoard.boardNumRows; i++ ) { // i for rows
     for (var j = 0; j < tBoard.boardNumColumns; j++) { // j for columns
@@ -146,7 +174,15 @@ function printToCanvas() {
       ctx.fillRect(x, y, cWidth, cHeight);
     }
   }
-
   // then we paint the tetromino
-  
+  for (var i = 0; i < tBoard.activeTetro.matrix.length; i++) {
+    for (var j = 0; j < tBoard.activeTetro.matrix[i].length; j++) {
+      var x = (tBoard.activeTetro.offset.x + j) * cWidth;
+      var y = (tBoard.activeTetro.offset.y + i) * cHeight;
+      if (tBoard.activeTetro.matrix[i][j] != 0) {
+        ctx.fillStyle = '#4971d5';
+        ctx.fillRect(x, y, cWidth, cHeight);
+      }
+    }
+  }
 }
