@@ -21,30 +21,96 @@ function TBoard() {
     this.activeTetro = {};
     this.activeTetro.offset = {y:0, x:3} // y for row offset, x for column offset
     this.activeTetro.matrix = tetroMatrix;
+    if (this.isMovAllowed('thisPlace')) {
+      return false;
+    }
+
+    return true;
   }
 
   this.moveTetroLeft = function() {
-    if (this.activeTetro != null) {
+    if (this.activeTetro != null && this.isMovAllowed('left')) {
       this.activeTetro.offset.x--;
+      return true;
     }
+    return false;
   }
 
   this.moveTetroUp = function() {
-    if (this.activeTetro != null) {
+    if (this.activeTetro != null && this.isMovAllowed('up')) {
       this.activeTetro.offset.y--;
+      return true;
     }
+    return false;
   }
 
   this.moveTetroRight = function() {
-    if (this.activeTetro != null) {
+    if (this.activeTetro != null && this.isMovAllowed('right')) {
       this.activeTetro.offset.x++;
+      return true;
     }
+    return false;
   }
 
   this.moveTetroDown = function() {
-    if (this.activeTetro != null) {
+    if (this.activeTetro != null && this.isMovAllowed('down')) {
       this.activeTetro.offset.y++;
+      return true;
     }
+    return false;
+  }
+
+  this.isMovAllowed = function(direction) {
+    // copy activeTetro offset in new offset object to work with it without disturbin original object
+    var newOffset = {};
+    var newOffset = {y: this.activeTetro.offset.y, x: this.activeTetro.offset.x};
+    switch(direction) {
+      case 'thisPlace':
+        break;
+      case 'left':
+        newOffset.x--;
+        break;
+      case 'up':
+        newOffset.y--;
+        break;
+      case 'right':
+        newOffset.x++;
+        break;
+      case 'down':
+        newOffset.y++;
+        break;
+    }
+
+    for (var i = 0; i < this.activeTetro.matrix.length; i++) {
+      for(var j = 0; j < this.activeTetro.matrix[0].length; j++) {
+        console.log("y: " + (i+newOffset.y) + "  x: " + (j+newOffset.x));
+        var tetroElement = this.activeTetro.matrix[i][j];
+        var boardElement;
+        if ( (i+newOffset.y < 0) || (i+newOffset.y >= this.boardNumRows)
+              || (j+newOffset.x < 0) || (j+newOffset.x >= this.boardNumColumns) ) {  // off board limits
+          boardElement = '9'
+        } else {
+          boardElement = this.board[i+newOffset.y][j+newOffset.x];
+        }
+        console.log(boardElement);
+        if (tetroElement != 0 && boardElement != 0) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  this.fuseTetro = function() {
+    for (var i = 0; i < this.activeTetro.matrix.length; i++) {
+      for (var j = 0; j < this.activeTetro.matrix[0].length; j++) {
+        if (this.activeTetro.matrix[i][j] != 0) {
+          this.board[i+this.activeTetro.offset.y][j+this.activeTetro.offset.x] = this.activeTetro.matrix[i][j];
+        }
+      }
+    }
+    this.activeTetro = null;
   }
 
   this.textPrintGState = function() {
@@ -132,7 +198,7 @@ initGame();
 
 
 function initGame() {
-  tBoard.pushTetro(tTetro);
+  //tBoard.pushTetro(tTetro);
   gameLoop();
 }
 
@@ -151,6 +217,17 @@ function gameLoop() {
 }
 
 function updateGame(){
+  if (tBoard.activeTetro == null) {
+    var added = tBoard.pushTetro(tTetro);
+    if (!added) {
+      console.log("Game Over!!");
+    }
+  } else {
+    var moved = tBoard.moveTetroDown();
+    if (!moved) {
+      tBoard.fuseTetro();
+    }
+  }
 }
 
 function renderGame() {
@@ -175,13 +252,15 @@ function printToCanvas() {
     }
   }
   // then we paint the tetromino
-  for (var i = 0; i < tBoard.activeTetro.matrix.length; i++) {
-    for (var j = 0; j < tBoard.activeTetro.matrix[i].length; j++) {
-      var x = (tBoard.activeTetro.offset.x + j) * cWidth;
-      var y = (tBoard.activeTetro.offset.y + i) * cHeight;
-      if (tBoard.activeTetro.matrix[i][j] != 0) {
-        ctx.fillStyle = '#4971d5';
-        ctx.fillRect(x, y, cWidth, cHeight);
+  if (tBoard.activeTetro != null) {
+    for (var i = 0; i < tBoard.activeTetro.matrix.length; i++) {
+      for (var j = 0; j < tBoard.activeTetro.matrix[i].length; j++) {
+        var x = (tBoard.activeTetro.offset.x + j) * cWidth;
+        var y = (tBoard.activeTetro.offset.y + i) * cHeight;
+        if (tBoard.activeTetro.matrix[i][j] != 0) {
+          ctx.fillStyle = '#4971d5';
+          ctx.fillRect(x, y, cWidth, cHeight);
+        }
       }
     }
   }
