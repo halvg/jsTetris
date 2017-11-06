@@ -22,10 +22,10 @@ function TBoard() {
     this.activeTetro.offset = {y:0, x:3} // y for row offset, x for column offset
     this.activeTetro.matrix = tetroMatrix;
     if (this.isMovAllowed('thisPlace')) {
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   this.moveTetroLeft = function() {
@@ -56,8 +56,10 @@ function TBoard() {
     if (this.activeTetro != null && this.isMovAllowed('down')) {
       this.activeTetro.offset.y++;
       return true;
+    } else {
+      this.fuseTetro();
+      return false;
     }
-    return false;
   }
 
   this.isMovAllowed = function(direction) {
@@ -83,7 +85,7 @@ function TBoard() {
 
     for (var i = 0; i < this.activeTetro.matrix.length; i++) {
       for(var j = 0; j < this.activeTetro.matrix[0].length; j++) {
-        console.log("y: " + (i+newOffset.y) + "  x: " + (j+newOffset.x));
+        //console.log("y: " + (i+newOffset.y) + "  x: " + (j+newOffset.x));
         var tetroElement = this.activeTetro.matrix[i][j];
         var boardElement;
         if ( (i+newOffset.y < 0) || (i+newOffset.y >= this.boardNumRows)
@@ -92,7 +94,7 @@ function TBoard() {
         } else {
           boardElement = this.board[i+newOffset.y][j+newOffset.x];
         }
-        console.log(boardElement);
+        //console.log(boardElement);
         if (tetroElement != 0 && boardElement != 0) {
           return false;
         }
@@ -181,7 +183,8 @@ function doKeyDown(event) {
       tBoard.moveTetroDown();
       break;
     default:
-      console.log(event.keyCode);
+      break;
+      //console.log(event.keyCode);
   }
 
 }
@@ -202,31 +205,36 @@ function initGame() {
   gameLoop();
 }
 
-var fps = 60/1000;
+var fps = 60;
 var last = new Date().getTime();
 function gameLoop() {
   var now = new Date().getTime();
   var delta = (now - last)/1000;
-  if (delta >= fps) {
+  if (delta >= (1/fps)) {
     console.log(delta);
-    updateGame();
+    updateGame(delta);
     renderGame();
     last = new Date().getTime();
   }
   requestAnimationFrame(gameLoop);
 }
 
-function updateGame(){
-  if (tBoard.activeTetro == null) {
-    var added = tBoard.pushTetro(tTetro);
-    if (!added) {
-      console.log("Game Over!!");
+var auxTime = 0;
+function updateGame(time){
+  auxTime += time;
+  if (tBoard.activeTetro == null || auxTime >= 1) {
+    if (tBoard.activeTetro == null) {
+      var added = tBoard.pushTetro(tTetro);
+      if (!added) {
+        console.log("Game Over!!");
+      }
+    } else {
+      var moved = tBoard.moveTetroDown();
+      /*if (!moved) {
+        tBoard.fuseTetro();
+      }*/
     }
-  } else {
-    var moved = tBoard.moveTetroDown();
-    if (!moved) {
-      tBoard.fuseTetro();
-    }
+    auxTime = 0;
   }
 }
 
