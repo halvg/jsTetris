@@ -104,6 +104,32 @@ function TBoard() {
     return true;
   }
 
+  this.rotateTetro = function() {
+    console.log("rotating");
+    if (this.activeTetro == null) {
+      return;
+    }
+    var newMatrix = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]
+    ];
+    textPrint2DMatrix(newMatrix);
+    var i2 = 0; var j2 = this.activeTetro.matrix[0].length-1;
+    for (var i = 0; i < this.activeTetro.matrix.length; i++) {
+      for (var j = 0; j < this.activeTetro.matrix[i].length; j++) {
+        textPrint2DMatrix(newMatrix);
+        console.log(i2 + " " + j2);
+        newMatrix[i2][j2] = this.activeTetro.matrix[i][j];
+        i2++;
+      }
+      console.log("new line");
+      i2 = 0;
+      j2--;
+    }
+    this.activeTetro.matrix = newMatrix;
+  }
+
   this.fuseTetro = function() {
     for (var i = 0; i < this.activeTetro.matrix.length; i++) {
       for (var j = 0; j < this.activeTetro.matrix[0].length; j++) {
@@ -144,9 +170,10 @@ function TBoard() {
 }
 
 var tTetro = [
-  [1, 1, 1],
-  [0, 1, 0],
-  [0, 0, 0]
+  [1, 1, 1, 0],
+  [0, 1, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0]
 ];
 
 
@@ -174,7 +201,7 @@ function doKeyDown(event) {
       tBoard.moveTetroLeft();
       break;
     case 38: //ArowUp
-      tBoard.moveTetroUp();
+      tBoard.rotateTetro();
       break;
     case 39: //ArowRight
       tBoard.moveTetroRight();
@@ -211,7 +238,7 @@ function gameLoop() {
   var now = new Date().getTime();
   var delta = (now - last)/1000;
   if (delta >= (1/fps)) {
-    console.log(delta);
+    //console.log(delta);
     updateGame(delta);
     renderGame();
     last = new Date().getTime();
